@@ -7,17 +7,17 @@ public class GUI {
     private JFrame frame;
     private JLabel statusLabel;
     private JPanel boardPanel;
+    private Board currentBoard;
 
     public GUI() {
         frame = new JFrame("Queens Solver - Brute Force");
-        frame.setSize(600, 600);
+        frame.setSize(700, 700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         JButton loadButton = new JButton("Load & Solve");
 
         statusLabel = new JLabel("Load a board file.", SwingConstants.CENTER);
-
         boardPanel = new JPanel();
 
         loadButton.addActionListener(e -> loadAndSolve());
@@ -34,24 +34,52 @@ public class GUI {
 
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
             try {
-                Board board = new Board(chooser.getSelectedFile().getAbsolutePath());
+                currentBoard = new Board(chooser.getSelectedFile().getAbsolutePath());
 
-                QueensSolver solver = new QueensSolver(board);
+                QueensSolver solver = new QueensSolver(currentBoard);
 
-                long start = System.currentTimeMillis();
-                boolean solved = solver.solve();
-                long end = System.currentTimeMillis();
+                SwingWorker<Boolean, int[]> worker = new SwingWorker<>() {
 
-                if (solved) {
-                    displayBoard(board, solver.getQueens());
-                    statusLabel.setText("Solved! Iterations: "
-                            + solver.getIterationCount()
-                            + " | Time: " + (end - start) + " ms");
-                } else {
-                    statusLabel.setText("No solution. Iterations: "
-                            + solver.getIterationCount()
-                            + " | Time: " + (end - start) + " ms");
-                }
+                    long startTime;
+
+                    @Override
+                    protected Boolean doInBackground() {
+                        startTime = System.currentTimeMillis();
+
+                        return solver.solve((queensSnapshot, iteration) -> {
+                            publish(queensSnapshot);
+                        });
+                    }
+
+                    @Override
+                    protected void process(java.util.List<int[]> chunks) {
+                        int[] latest = chunks.get(chunks.size() - 1);
+                        displayBoard(currentBoard, latest);
+                        statusLabel.setText("Iterations: " + solver.getIterationCount());
+                    }
+
+                    @Override
+                    protected void done() {
+                        long endTime = System.currentTimeMillis();
+                        try {
+                            boolean solved = get();
+                            if (solved) {
+                                displayBoard(currentBoard, solver.getQueens());
+                                statusLabel.setText("Solved! Iterations: "
+                                        + solver.getIterationCount()
+                                        + " | Time: " + (endTime - startTime) + " ms");
+                            } else {
+                                statusLabel.setText("No solution found. Iterations: "
+                                        + solver.getIterationCount()
+                                        + " | Time: " + (endTime - startTime) + " ms");
+                            }
+                        } catch (Exception e) {
+                            statusLabel.setText("Error during solving.");
+                        }
+                    }
+                };
+
+                worker.execute();
 
             } catch (IOException ex) {
                 statusLabel.setText("Error reading file.");

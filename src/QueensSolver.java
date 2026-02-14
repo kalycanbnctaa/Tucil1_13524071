@@ -1,12 +1,17 @@
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
 
 public class QueensSolver {
 
+    public interface UpdateListener {
+        void onUpdate(int[] queensSnapshot, long iteration);
+    }
+
     private Board board;
     private int size;
-    private int[] queens; 
-    private long iterationCount = 0;
-    private boolean foundSolution = false;
+    private int[] queens;
+    private long iterationCount;
+    private boolean foundSolution;
 
     public QueensSolver(Board board) {
         this.board = board;
@@ -16,12 +21,19 @@ public class QueensSolver {
         for (int i = 0; i < size; i++) {
             queens[i] = i;
         }
+
+        this.iterationCount = 0;
+        this.foundSolution = false;
     }
 
-    public boolean solve() {
+    public boolean solve(UpdateListener listener) {
 
         do {
             iterationCount++;
+
+            if (listener != null && iterationCount % 100 == 0) {
+                listener.onUpdate(queens.clone(), iterationCount);
+            }
 
             if (isValid()) {
                 foundSolution = true;
@@ -34,10 +46,9 @@ public class QueensSolver {
     }
 
     private boolean isValid() {
-        return checkDiagonal() && checkRegion() && checkAdjacency();
+        return checkDiagonal() && checkRegion();
     }
 
-    // Cek konflik diagonal
     private boolean checkDiagonal() {
         for (int i = 0; i < size; i++) {
             for (int j = i + 1; j < size; j++) {
@@ -49,7 +60,6 @@ public class QueensSolver {
         return true;
     }
 
-    // Cek 1 queen per region
     private boolean checkRegion() {
         Set<Character> usedRegions = new HashSet<>();
 
@@ -61,18 +71,6 @@ public class QueensSolver {
             usedRegions.add(region);
         }
 
-        return true;
-    }
-
-    // Cek adjacency (tidak boleh berdampingan)
-    private boolean checkAdjacency() {
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                if (Math.abs(i - j) <= 1 && Math.abs(queens[i] - queens[j]) <= 1) {
-                    return false;
-                }
-            }
-        }
         return true;
     }
 
