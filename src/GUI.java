@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -32,7 +33,7 @@ public class GUI {
         topPanel.add(loadButton);
         topPanel.add(saveButton);
 
-        statusLabel = new JLabel("Load a board file.", SwingConstants.CENTER);
+        statusLabel = new JLabel("Load a board file (.txt).", SwingConstants.CENTER);
         boardPanel = new JPanel();
 
         loadButton.addActionListener(e -> loadAndSolve());
@@ -46,11 +47,38 @@ public class GUI {
     }
 
     private void loadAndSolve() {
+
+        // Informasi ke user
+        JOptionPane.showMessageDialog(
+                frame,
+                "Silakan pilih file input dengan format .txt",
+                "Input File",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
         JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter(
+                "Text Files (*.txt)", "txt"
+        ));
 
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+
+            File selectedFile = chooser.getSelectedFile();
+            String fileName = selectedFile.getName().toLowerCase();
+
+            // Validasi ekstensi file
+            if (!fileName.endsWith(".txt")) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Error: File input harus berformat .txt",
+                        "Invalid File",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
             try {
-                currentBoard = new Board(chooser.getSelectedFile().getAbsolutePath());
+                currentBoard = new Board(selectedFile.getAbsolutePath());
 
                 if (currentBoard.getSize() > 10) {
                     JOptionPane.showMessageDialog(
