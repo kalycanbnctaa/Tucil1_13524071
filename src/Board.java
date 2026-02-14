@@ -1,4 +1,6 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Board {
 
@@ -10,35 +12,39 @@ public class Board {
     }
 
     private void readFromFile(String filePath) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(filePath));
 
-        String firstLine = br.readLine();
-        if (firstLine == null) {
-            br.close();
-            throw new IOException("File kosong.");
-        }
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 
-        size = Integer.parseInt(firstLine.trim());
-        if (size <= 0) {
-            br.close();
-            throw new IOException("Ukuran board tidak valid.");
-        }
-
-        regions = new char[size][size];
-
-        for (int i = 0; i < size; i++) {
-            String line = br.readLine();
-            if (line == null || line.length() != size) {
-                br.close();
-                throw new IOException("Format board tidak sesuai pada baris " + i);
+            String firstLine = br.readLine();
+            if (firstLine == null) {
+                throw new IOException("File kosong.");
             }
 
-            for (int j = 0; j < size; j++) {
-                regions[i][j] = line.charAt(j);
+            // Validasi ukuran board
+            try {
+                size = Integer.parseInt(firstLine.trim());
+            } catch (NumberFormatException e) {
+                throw new IOException("Baris pertama harus berupa angka ukuran board.");
+            }
+
+            if (size <= 0) {
+                throw new IOException("Ukuran board tidak valid.");
+            }
+
+            regions = new char[size][size];
+
+            for (int i = 0; i < size; i++) {
+                String line = br.readLine();
+
+                if (line == null || line.length() != size) {
+                    throw new IOException("Format board tidak sesuai pada baris " + i);
+                }
+
+                for (int j = 0; j < size; j++) {
+                    regions[i][j] = line.charAt(j);
+                }
             }
         }
-
-        br.close();
     }
 
     public int getSize() {
