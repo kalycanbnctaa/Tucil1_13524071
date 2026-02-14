@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Board {
 
@@ -43,6 +45,21 @@ public class Board {
                 for (int j = 0; j < size; j++) {
                     regions[i][j] = line.charAt(j);
                 }
+            }
+
+            // Validasi jumlah region maksimal 26
+            Set<Character> uniqueRegions = new HashSet<>();
+
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    uniqueRegions.add(regions[i][j]);
+                }
+            }
+
+            if (uniqueRegions.size() > 26) {
+                throw new IOException(
+                    "Jumlah region melebihi 26 (" + uniqueRegions.size() + "). Maksimal 26 region yang diperbolehkan."
+                );
             }
 
             if (br.readLine() != null) {
