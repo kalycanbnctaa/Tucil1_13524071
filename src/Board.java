@@ -37,7 +37,7 @@ public class Board {
                 String line = br.readLine();
 
                 if (line == null || line.length() != size) {
-                    throw new IOException("Format board tidak sesuai pada baris " + i);
+                    throw new IOException("Format board tidak sesuai pada baris " + (i+2));
                 }
 
                 for (int j = 0; j < size; j++) {
