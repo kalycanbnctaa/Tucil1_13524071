@@ -12,11 +12,27 @@ public class Board {
     private void readFromFile(String filePath) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(filePath));
 
-        size = Integer.parseInt(br.readLine().trim());
+        String firstLine = br.readLine();
+        if (firstLine == null) {
+            br.close();
+            throw new IOException("File kosong.");
+        }
+
+        size = Integer.parseInt(firstLine.trim());
+        if (size <= 0) {
+            br.close();
+            throw new IOException("Ukuran board tidak valid.");
+        }
+
         regions = new char[size][size];
 
         for (int i = 0; i < size; i++) {
             String line = br.readLine();
+            if (line == null || line.length() != size) {
+                br.close();
+                throw new IOException("Format board tidak sesuai pada baris " + i);
+            }
+
             for (int j = 0; j < size; j++) {
                 regions[i][j] = line.charAt(j);
             }
