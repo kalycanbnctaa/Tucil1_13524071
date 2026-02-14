@@ -43,6 +43,11 @@ public class QueensSolver {
 
             if (isValid()) {
                 foundSolution = true;
+
+                if (listener != null) {
+                    listener.onUpdate(queens.clone(), iterationCount);
+                }
+                
                 return true;
             }
 
