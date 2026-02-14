@@ -38,12 +38,27 @@ public class Board {
             for (int i = 0; i < size; i++) {
                 String line = br.readLine();
 
-                if (line == null || line.length() != size) {
-                    throw new IOException("Format board tidak sesuai pada baris " + (i+2));
+                if (line == null) {
+                    throw new IOException("Jumlah baris kurang dari ukuran board.");
+                }
+
+                line = line.trim(); 
+
+                if (line.length() != size) {
+                    throw new IOException("Format board tidak sesuai pada baris " + (i + 2));
                 }
 
                 for (int j = 0; j < size; j++) {
-                    regions[i][j] = line.charAt(j);
+                    char c = line.charAt(j);
+
+                    if (c < 'A' || c > 'Z') {
+                        throw new IOException(
+                            "Region harus berupa huruf A-Z. Ditemukan '" + c +
+                            "' pada baris " + (i + 2) + ", kolom " + (j + 1)
+                        );
+                    }
+
+                    regions[i][j] = c;
                 }
             }
 
@@ -58,10 +73,12 @@ public class Board {
 
             if (uniqueRegions.size() > 26) {
                 throw new IOException(
-                    "Jumlah region melebihi 26 (" + uniqueRegions.size() + "). Maksimal 26 region yang diperbolehkan."
+                    "Jumlah region melebihi 26 (" + uniqueRegions.size() +
+                    "). Maksimal 26 region yang diperbolehkan."
                 );
             }
 
+            // Validasi baris berlebih
             if (br.readLine() != null) {
                 throw new IOException("Jumlah baris lebih dari ukuran board.");
             }
