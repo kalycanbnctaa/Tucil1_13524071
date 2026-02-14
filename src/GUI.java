@@ -48,13 +48,7 @@ public class GUI {
 
     private void loadAndSolve() {
 
-        // Informasi ke user
-        JOptionPane.showMessageDialog(
-                frame,
-                "Silakan pilih file input dengan format .txt",
-                "Input File",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        showInfo("Silakan pilih file input dengan format .txt");
 
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter(
@@ -66,14 +60,8 @@ public class GUI {
             File selectedFile = chooser.getSelectedFile();
             String fileName = selectedFile.getName().toLowerCase();
 
-            // Validasi ekstensi file
             if (!fileName.endsWith(".txt")) {
-                JOptionPane.showMessageDialog(
-                        frame,
-                        "Error: File input harus berformat .txt",
-                        "Invalid File",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                showError("File input harus berformat .txt");
                 return;
             }
 
@@ -81,12 +69,7 @@ public class GUI {
                 currentBoard = new Board(selectedFile.getAbsolutePath());
 
                 if (currentBoard.getSize() > 10) {
-                    JOptionPane.showMessageDialog(
-                            frame,
-                            "Warning: N besar dapat menyebabkan waktu komputasi sangat lama.",
-                            "Warning",
-                            JOptionPane.WARNING_MESSAGE
-                    );
+                    showWarning("N besar dapat menyebabkan waktu komputasi sangat lama.");
                 }
 
                 QueensSolver solver = new QueensSolver(currentBoard);
@@ -128,13 +111,14 @@ public class GUI {
                                 );
                                 saveButton.setEnabled(true);
                             } else {
+                                showWarning("Tidak ditemukan solusi.");
                                 statusLabel.setText(
                                         "No solution found. Iterations: " + solver.getIterationCount()
                                                 + " | Time: " + (endTime - startTime) + " ms"
                                 );
                             }
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(frame, "Error during solving.");
+                            showError("Terjadi error saat proses solving.");
                         }
                     }
                 };
@@ -142,7 +126,7 @@ public class GUI {
                 worker.execute();
 
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Error!\n" + ex.getMessage());
+                showError("Error membaca file:\n" + ex.getMessage());
             }
         }
     }
@@ -196,7 +180,11 @@ public class GUI {
     }
 
     private void saveSolution() {
-        if (currentSolution == null || currentBoard == null) return;
+
+        if (currentSolution == null || currentBoard == null) {
+            showError("No solution available to save!");
+            return;
+        }
 
         String[] options = {"Save as TXT", "Save as PNG"};
         int choice = JOptionPane.showOptionDialog(
@@ -221,9 +209,9 @@ public class GUI {
                 } else {
                     saveAsPNG(new File(file.getAbsolutePath() + ".png"));
                 }
-                JOptionPane.showMessageDialog(frame, "Solution saved successfully!");
+                showInfo("Solution saved successfully!");
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(frame, "Error saving file.");
+                showError("Error saving file.");
             }
         }
     }
@@ -233,7 +221,7 @@ public class GUI {
             int size = currentBoard.getSize();
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    pw.print(currentSolution[i] == j ? "♛ " : ". ");
+                    pw.print(currentSolution[i] == j ? "# " : ". ");
                 }
                 pw.println();
             }
@@ -266,5 +254,32 @@ public class GUI {
 
         g.dispose();
         ImageIO.write(img, "png", file);
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(
+                frame,
+                message,
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    private void showWarning(String message) {
+        JOptionPane.showMessageDialog(
+                frame,
+                message,
+                "Warning",
+                JOptionPane.WARNING_MESSAGE
+        );
+    }
+
+    private void showInfo(String message) {
+        JOptionPane.showMessageDialog(
+                frame,
+                message,
+                "Information",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 }
