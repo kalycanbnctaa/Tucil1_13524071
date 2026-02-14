@@ -13,6 +13,9 @@ public class QueensSolver {
     private long iterationCount;
     private boolean foundSolution;
 
+    private long lastUpdateTime = 0;
+    private static final long UPDATE_INTERVAL = 250; 
+
     public QueensSolver(Board board) {
         this.board = board;
         this.size = board.getSize();
@@ -31,8 +34,11 @@ public class QueensSolver {
         do {
             iterationCount++;
 
-            if (listener != null && iterationCount % 100 == 0) {
+            // Live update berdasarkan waktu
+            long now = System.currentTimeMillis();
+            if (listener != null && now - lastUpdateTime >= UPDATE_INTERVAL) {
                 listener.onUpdate(queens.clone(), iterationCount);
+                lastUpdateTime = now;
             }
 
             if (isValid()) {
