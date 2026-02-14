@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.ImageIO;
 
 public class GUI {
 
@@ -51,10 +53,12 @@ public class GUI {
                 currentBoard = new Board(chooser.getSelectedFile().getAbsolutePath());
 
                 if (currentBoard.getSize() > 10) {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(
+                            frame,
                             "Warning: N besar dapat menyebabkan waktu komputasi sangat lama.",
                             "Warning",
-                            JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.WARNING_MESSAGE
+                    );
                 }
 
                 QueensSolver solver = new QueensSolver(currentBoard);
@@ -70,9 +74,7 @@ public class GUI {
                     @Override
                     protected Boolean doInBackground() {
                         startTime = System.currentTimeMillis();
-                        return solver.solve((queensSnapshot, iteration) -> {
-                            publish(queensSnapshot);
-                        });
+                        return solver.solve((queensSnapshot, iteration) -> publish(queensSnapshot));
                     }
 
                     @Override
@@ -92,23 +94,19 @@ public class GUI {
                             if (solved) {
                                 currentSolution = solver.getQueens().clone();
                                 displayBoard(currentBoard, currentSolution);
-                                statusLabel.setText("Solved! Iterations: "
-                                        + solver.getIterationCount()
-                                        + " | Time: " + (endTime - startTime) + " ms");
+                                statusLabel.setText(
+                                        "Solved! Iterations: " + solver.getIterationCount()
+                                                + " | Time: " + (endTime - startTime) + " ms"
+                                );
                                 saveButton.setEnabled(true);
                             } else {
-                                saveButton.setEnabled(false);
-                                statusLabel.setText("No solution found. Iterations: "
-                                        + solver.getIterationCount()
-                                        + " | Time: " + (endTime - startTime) + " ms");
+                                statusLabel.setText(
+                                        "No solution found. Iterations: " + solver.getIterationCount()
+                                                + " | Time: " + (endTime - startTime) + " ms"
+                                );
                             }
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(
-                                    frame,
-                                    "Error during solving.",
-                                    "Error",
-                                    JOptionPane.ERROR_MESSAGE
-                            );
+                            JOptionPane.showMessageDialog(frame, "Error during solving.");
                         }
                     }
                 };
@@ -116,18 +114,7 @@ public class GUI {
                 worker.execute();
 
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(
-                        frame,
-                        "❌ Error\n" + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                boardPanel.removeAll();
-                boardPanel.revalidate();
-                boardPanel.repaint();
-
-                statusLabel.setText("Error reading file.");
+                JOptionPane.showMessageDialog(frame, "Error!\n" + ex.getMessage());
             }
         }
     }
@@ -137,18 +124,15 @@ public class GUI {
 
         int size = board.getSize();
         boardPanel.setLayout(new GridLayout(size, size));
-
         Map<Character, Color> colorMap = generateRegionColors(board);
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
 
                 JLabel cell = new JLabel("", SwingConstants.CENTER);
-                cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 cell.setOpaque(true);
-
-                char region = board.getRegion(i, j);
-                cell.setBackground(colorMap.get(region));
+                cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                cell.setBackground(colorMap.get(board.getRegion(i, j)));
 
                 if (queens[i] == j) {
                     cell.setText("♛");
@@ -172,45 +156,87 @@ public class GUI {
                 Color.LIGHT_GRAY, Color.YELLOW, Color.GREEN
         };
 
-        int colorIndex = 0;
-
-        for (int i = 0; i < regions.length; i++) {
-            for (int j = 0; j < regions.length; j++) {
-                char r = regions[i][j];
-                if (!map.containsKey(r)) {
-                    map.put(r, palette[colorIndex % palette.length]);
-                    colorIndex++;
+        int idx = 0;
+        for (char[] row : regions) {
+            for (char c : row) {
+                if (!map.containsKey(c)) {
+                    map.put(c, palette[idx++ % palette.length]);
                 }
             }
         }
-
         return map;
     }
 
     private void saveSolution() {
         if (currentSolution == null || currentBoard == null) return;
 
+        String[] options = {"Save as TXT", "Save as PNG"};
+        int choice = JOptionPane.showOptionDialog(
+                frame,
+                "Pilih format penyimpanan:",
+                "Save Solution",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == -1) return;
+
         JFileChooser chooser = new JFileChooser();
         if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            try (PrintWriter pw = new PrintWriter(chooser.getSelectedFile())) {
-
-                int size = currentBoard.getSize();
-                for (int i = 0; i < size; i++) {
-                    for (int j = 0; j < size; j++) {
-                        if (currentSolution[i] == j) {
-                            pw.print("Q ");
-                        } else {
-                            pw.print(". ");
-                        }
-                    }
-                    pw.println();
+            try {
+                File file = chooser.getSelectedFile();
+                if (choice == 0) {
+                    saveAsTXT(new File(file.getAbsolutePath() + ".txt"));
+                } else {
+                    saveAsPNG(new File(file.getAbsolutePath() + ".png"));
                 }
-
                 JOptionPane.showMessageDialog(frame, "Solution saved successfully!");
-
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(frame, "Error saving file.");
             }
         }
+    }
+
+    private void saveAsTXT(File file) throws IOException {
+        try (PrintWriter pw = new PrintWriter(file)) {
+            int size = currentBoard.getSize();
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    pw.print(currentSolution[i] == j ? "♛ " : ". ");
+                }
+                pw.println();
+            }
+        }
+    }
+
+    private void saveAsPNG(File file) throws IOException {
+        int cell = 60;
+        int size = currentBoard.getSize();
+        BufferedImage img = new BufferedImage(
+                size * cell, size * cell, BufferedImage.TYPE_INT_ARGB
+        );
+
+        Graphics2D g = img.createGraphics();
+        Map<Character, Color> colors = generateRegionColors(currentBoard);
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                g.setColor(colors.get(currentBoard.getRegion(i, j)));
+                g.fillRect(j * cell, i * cell, cell, cell);
+                g.setColor(Color.BLACK);
+                g.drawRect(j * cell, i * cell, cell, cell);
+
+                if (currentSolution[i] == j) {
+                    g.setFont(new Font("Serif", Font.BOLD, 40));
+                    g.drawString("♛", j * cell + 15, i * cell + 45);
+                }
+            }
+        }
+
+        g.dispose();
+        ImageIO.write(img, "png", file);
     }
 }
