@@ -44,6 +44,10 @@ public class Board {
                     regions[i][j] = line.charAt(j);
                 }
             }
+
+            if (br.readLine() != null) {
+                throw new IOException("Jumlah baris lebih dari ukuran board.");
+            }
         }
     }
 
