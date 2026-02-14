@@ -3,6 +3,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Board {
 
@@ -17,44 +19,52 @@ public class Board {
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 
-            String firstLine = br.readLine();
-            if (firstLine == null) {
+            List<String> lines = new ArrayList<>();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+
+                if (!line.isEmpty()) {
+                    lines.add(line);
+                }
+            }
+
+            if (lines.isEmpty()) {
                 throw new IOException("File kosong.");
             }
 
-            // Validasi ukuran board
-            try {
-                size = Integer.parseInt(firstLine.trim());
-            } catch (NumberFormatException e) {
-                throw new IOException("Baris pertama harus berupa angka ukuran board.");
+            size = lines.size();
+            int rowLength = lines.get(0).length();
+
+            if (rowLength == 0) {
+                throw new IOException("Baris tidak boleh kosong.");
             }
 
-            if (size <= 0) {
-                throw new IOException("Ukuran board tidak valid.");
+            if (rowLength != size) {
+                throw new IOException("Board harus berbentuk persegi (NxN).");
             }
 
             regions = new char[size][size];
 
             for (int i = 0; i < size; i++) {
-                String line = br.readLine();
 
-                if (line == null) {
-                    throw new IOException("Jumlah baris kurang dari ukuran board.");
-                }
+                String currentLine = lines.get(i);
 
-                line = line.trim(); 
-
-                if (line.length() != size) {
-                    throw new IOException("Format board tidak sesuai pada baris " + (i + 2));
+                if (currentLine.length() != rowLength) {
+                    throw new IOException(
+                        "Panjang baris tidak konsisten pada baris " + (i + 1)
+                    );
                 }
 
                 for (int j = 0; j < size; j++) {
-                    char c = line.charAt(j);
+
+                    char c = currentLine.charAt(j);
 
                     if (c < 'A' || c > 'Z') {
                         throw new IOException(
                             "Region harus berupa huruf A-Z. Ditemukan '" + c +
-                            "' pada baris " + (i + 2) + ", kolom " + (j + 1)
+                            "' pada baris " + (i + 1) + ", kolom " + (j + 1)
                         );
                     }
 
@@ -62,7 +72,6 @@ public class Board {
                 }
             }
 
-            // Validasi jumlah region maksimal 26
             Set<Character> uniqueRegions = new HashSet<>();
 
             for (int i = 0; i < size; i++) {
@@ -76,11 +85,6 @@ public class Board {
                     "Jumlah region melebihi 26 (" + uniqueRegions.size() +
                     "). Maksimal 26 region yang diperbolehkan."
                 );
-            }
-
-            // Validasi baris berlebih
-            if (br.readLine() != null) {
-                throw new IOException("Jumlah baris lebih dari ukuran board.");
             }
         }
     }
