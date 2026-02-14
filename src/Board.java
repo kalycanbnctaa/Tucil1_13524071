@@ -21,13 +21,18 @@ public class Board {
 
             List<String> lines = new ArrayList<>();
             String line;
+            int lineNumber = 0;
 
             while ((line = br.readLine()) != null) {
-                line = line.trim();
+                lineNumber++;
 
-                if (!line.isEmpty()) {
-                    lines.add(line);
+                if (line.trim().isEmpty()) {
+                    throw new IOException(
+                        "Terdapat baris kosong pada baris " + lineNumber
+                    );
                 }
+
+                lines.add(line.trim());
             }
 
             if (lines.isEmpty()) {
@@ -42,7 +47,10 @@ public class Board {
             }
 
             if (rowLength != size) {
-                throw new IOException("Board harus berbentuk persegi (NxN).");
+                throw new IOException(
+                    "Board harus berbentuk persegi (NxN). " +
+                    "Ditemukan " + size + " baris dan panjang " + rowLength
+                );
             }
 
             regions = new char[size][size];
@@ -64,7 +72,8 @@ public class Board {
                     if (c < 'A' || c > 'Z') {
                         throw new IOException(
                             "Region harus berupa huruf A-Z. Ditemukan '" + c +
-                            "' pada baris " + (i + 1) + ", kolom " + (j + 1)
+                            "' pada baris " + (i + 1) +
+                            ", kolom " + (j + 1)
                         );
                     }
 
@@ -82,7 +91,8 @@ public class Board {
 
             if (uniqueRegions.size() > 26) {
                 throw new IOException(
-                    "Jumlah region melebihi 26 (" + uniqueRegions.size() +
+                    "Jumlah region melebihi 26 (" +
+                    uniqueRegions.size() +
                     "). Maksimal 26 region yang diperbolehkan."
                 );
             }
