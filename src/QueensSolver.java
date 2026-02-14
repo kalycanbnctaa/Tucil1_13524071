@@ -57,19 +57,18 @@ public class QueensSolver {
     }
 
     private boolean isValid() {
-        return checkDiagonal() && checkRegion();
+        return checkAdjacent() && checkRegion();
     }
 
-    private boolean checkDiagonal() {
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                if (Math.abs(i - j) == Math.abs(queens[i] - queens[j])) {
-                    return false;
-                }
-            }
+    private boolean checkAdjacent() {
+    for (int i = 0; i < size - 1; i++) {
+        int colDiff = Math.abs(queens[i] - queens[i + 1]);
+        if (colDiff <= 1) {
+            return false;
         }
-        return true;
     }
+    return true;
+}
 
     private boolean checkRegion() {
         Set<Character> usedRegions = new HashSet<>();
