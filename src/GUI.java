@@ -151,8 +151,8 @@ public class GUI {
                 cell.setBackground(colorMap.get(region));
 
                 if (queens[i] == j) {
-                    cell.setText("Q");
-                    cell.setFont(new Font("SansSerif", Font.BOLD, size > 8 ? 16 : 24));
+                    cell.setText("♛");
+                    cell.setFont(new Font("Serif", Font.BOLD, size > 8 ? 24 : 36));
                 }
 
                 boardPanel.add(cell);
