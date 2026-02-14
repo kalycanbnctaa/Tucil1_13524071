@@ -219,9 +219,15 @@ public class GUI {
     private void saveAsTXT(File file) throws IOException {
         try (PrintWriter pw = new PrintWriter(file)) {
             int size = currentBoard.getSize();
+
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    pw.print(currentSolution[i] == j ? "# " : ". ");
+
+                    if (currentSolution[i] == j) {
+                        pw.print("#");
+                    } else {
+                        pw.print(currentBoard.getRegion(i, j));
+                    }
                 }
                 pw.println();
             }
