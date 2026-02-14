@@ -18,6 +18,7 @@ public class GUI {
     public GUI() {
         frame = new JFrame("Queens Solver - Brute Force");
         frame.setSize(800, 800);
+        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -60,6 +61,7 @@ public class GUI {
 
                 loadButton.setEnabled(false);
                 saveButton.setEnabled(false);
+                statusLabel.setText("Solving...");
 
                 SwingWorker<Boolean, int[]> worker = new SwingWorker<>() {
 
@@ -95,12 +97,18 @@ public class GUI {
                                         + " | Time: " + (endTime - startTime) + " ms");
                                 saveButton.setEnabled(true);
                             } else {
+                                saveButton.setEnabled(false);
                                 statusLabel.setText("No solution found. Iterations: "
                                         + solver.getIterationCount()
                                         + " | Time: " + (endTime - startTime) + " ms");
                             }
                         } catch (Exception e) {
-                            statusLabel.setText("Error during solving.");
+                            JOptionPane.showMessageDialog(
+                                    frame,
+                                    "Error during solving.",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
                         }
                     }
                 };
@@ -108,7 +116,18 @@ public class GUI {
                 worker.execute();
 
             } catch (IOException ex) {
-                statusLabel.setText("Error reading file: " + ex.getMessage());
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "❌ Error\n" + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                boardPanel.removeAll();
+                boardPanel.revalidate();
+                boardPanel.repaint();
+
+                statusLabel.setText("Error reading file.");
             }
         }
     }
@@ -133,7 +152,7 @@ public class GUI {
 
                 if (queens[i] == j) {
                     cell.setText("Q");
-                    cell.setFont(new Font("Arial", Font.BOLD, 20));
+                    cell.setFont(new Font("SansSerif", Font.BOLD, size > 8 ? 16 : 24));
                 }
 
                 boardPanel.add(cell);
