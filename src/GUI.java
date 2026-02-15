@@ -126,6 +126,17 @@ public class GUI {
                 worker.execute();
 
             } catch (IOException ex) {
+                currentBoard = null;
+                currentSolution = null;
+
+                boardPanel.removeAll();
+                boardPanel.revalidate();
+                boardPanel.repaint();
+
+                statusLabel.setText("Input tidak valid.");
+
+                saveButton.setEnabled(false);
+
                 showError("Error membaca file:\n" + ex.getMessage());
             }
         }
