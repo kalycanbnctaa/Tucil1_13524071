@@ -174,18 +174,21 @@ public class GUI {
         Map<Character, Color> map = new HashMap<>();
         char[][] regions = board.getRegions();
 
+        final float GOLDEN_RATIO = 0.61803398875f;
+
         for (char[] row : regions) {
             for (char c : row) {
                 if (!map.containsKey(c)) {
                     int idx = c - 'A';
-                    float hue = idx / 26f;          
-                    Color color = Color.getHSBColor(hue, 0.5f, 0.95f);
+                    float hue = (idx * GOLDEN_RATIO) % 1f;
+                    Color color = Color.getHSBColor(hue, 0.6f, 0.95f);
                     map.put(c, color);
                 }
             }
         }
         return map;
     }
+
 
     private void saveSolution() {
 
