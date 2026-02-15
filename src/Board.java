@@ -23,6 +23,7 @@ public class Board {
             String line;
             int lineNumber = 0;
 
+            // Baca semua baris
             while ((line = br.readLine()) != null) {
                 lineNumber++;
 
@@ -55,6 +56,7 @@ public class Board {
 
             regions = new char[size][size];
 
+            // Isi regions dan validasi karakter
             for (int i = 0; i < size; i++) {
 
                 String currentLine = lines.get(i);
@@ -81,6 +83,7 @@ public class Board {
                 }
             }
 
+            // Hitung jumlah region unik
             Set<Character> uniqueRegions = new HashSet<>();
 
             for (int i = 0; i < size; i++) {
@@ -94,6 +97,14 @@ public class Board {
                     "Jumlah region melebihi 26 (" +
                     uniqueRegions.size() +
                     "). Maksimal 26 region yang diperbolehkan."
+                );
+            }
+
+            if (uniqueRegions.size() != size) {
+                throw new IOException(
+                    "Jumlah region harus sama dengan ukuran board (" +
+                    size + "), tetapi ditemukan " +
+                    uniqueRegions.size() + " region unik."
                 );
             }
         }
