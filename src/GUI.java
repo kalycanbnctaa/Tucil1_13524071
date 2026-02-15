@@ -174,16 +174,13 @@ public class GUI {
         Map<Character, Color> map = new HashMap<>();
         char[][] regions = board.getRegions();
 
-        Color[] palette = {
-                Color.PINK, Color.CYAN, Color.ORANGE,
-                Color.LIGHT_GRAY, Color.YELLOW, Color.GREEN
-        };
-
-        int idx = 0;
         for (char[] row : regions) {
             for (char c : row) {
                 if (!map.containsKey(c)) {
-                    map.put(c, palette[idx++ % palette.length]);
+                    int idx = c - 'A';
+                    float hue = idx / 26f;          
+                    Color color = Color.getHSBColor(hue, 0.5f, 0.95f);
+                    map.put(c, color);
                 }
             }
         }
