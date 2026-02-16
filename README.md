@@ -23,6 +23,7 @@ Make sure Java is installed by running:
 
 ```bash
 java -version
+````
 
 ---
 
@@ -183,9 +184,9 @@ The GUI provides the following features:
 
 ## Author
 
-Name: Kalyca Nathania B. Manullang
-NIM: 13524071
-Class: 01
+| NIM      | Name                          | Class |
+|:--------:|-------------------------------|:-----:|
+| 13524071 | Kalyca Nathania B. Manullang | 01    |
 
 ---
 
