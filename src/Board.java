@@ -107,8 +107,61 @@ public class Board {
                     uniqueRegions.size() + " region unik."
                 );
             }
+
+            validateConnectedRegions();
         }
     }
+
+    // VALIDASI REGION TERHUBUNG
+
+    private void validateConnectedRegions() throws IOException {
+        boolean[][] visited = new boolean[size][size];
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (!visited[i][j]) {
+                    char region = regions[i][j];
+                    int connectedCount = dfs(i, j, region, visited);
+                    int totalCount = countRegion(region);
+
+                    if (connectedCount != totalCount) {
+                        throw new IOException(
+                            "Region '" + region + "' tidak terhubung secara utuh."
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private int dfs(int r, int c, char region, boolean[][] visited) {
+        if (r < 0 || r >= size || c < 0 || c >= size) return 0;
+        if (visited[r][c] || regions[r][c] != region) return 0;
+
+        visited[r][c] = true;
+        int count = 1;
+
+        count += dfs(r + 1, c, region, visited);
+        count += dfs(r - 1, c, region, visited);
+        count += dfs(r, c + 1, region, visited);
+        count += dfs(r, c - 1, region, visited);
+
+        return count;
+    }
+
+    private int countRegion(char region) {
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (regions[i][j] == region) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    // GETTER
 
     public int getSize() {
         return size;
