@@ -34,6 +34,13 @@ java -version
 ```text
 Tucil1_13524071/
 ├── bin/
+│   ├── Board.class
+│   ├── GUI.class
+│   ├── GUI$1.class
+│   ├── Main.class
+│   ├── PermutationGenerator.class
+│   ├── QueensSolver.class
+│   ├── QueensSolver$UpdateListener.class
 ├── doc/
 │   └── Tucil1_K1_13524071_Kalyca Nathania B. Manullang.pdf
 ├── src/
@@ -73,16 +80,16 @@ Tucil1_13524071/
 git clone https://github.com/kalycanbnctaa/Tucil1_13524071
 ```
 
-2. Navigate to the src folder
+2. Navigate to the project root directory
 
 ```bash
-cd Tucil1_13524071/src
+cd Tucil1_13524071
 ```
 
-3. Compile all Java files
+3. Compile all Java source files
 
 ```bash
-javac *.java
+javac -d bin src/*.java
 ```
 
 ---
@@ -92,7 +99,7 @@ javac *.java
 Run the program with:
 
 ```bash
-java Main
+java -cp bin Main
 ```
 
 The program will launch the Graphical User Interface (GUI).
