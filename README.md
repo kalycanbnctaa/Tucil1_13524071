@@ -67,7 +67,6 @@ Tucil1_13524071/
 │   ├── tc8.txt
 │   ├── tc9.txt
 │   ├── tc10.txt
-│   ├── tc11.txt
 └── README.md
 ```
 
@@ -150,7 +149,6 @@ Input constraints:
 - The number of unique regions must equal N
 - Maximum of 26 regions allowed
 - No empty lines allowed
-- Each region must be a single connected component (not separated)
 
 ---
 
